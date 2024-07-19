@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Summarizer!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylevideo.css') }}">
+    <script src="{{ url_for('static', filename='scriptvideo.js') }}"></script>
+</head>
+<body>
+    <header>
+        <h1>DocQ</h1>
+        <h2>Video Summarizer</h2>
+    </header>
+    <div class="container">
+        <div class="tab-container">
+            <button class="tab-button active" data-tab="import">Import Video</button>
+            <button class="tab-button" data-tab="youtube">YouTube Video</button>
+        </div>
+        <div id="import" class="section active">
+            <input type="file" id="file-upload" accept="video/*">
+            <label for="file-upload" class="custom-file-upload">Choose File</label>
+            <button class="summarize" onclick="summarizeVideo('import')">Summarize</button>
+        </div>
+        <div id="youtube" class="section">
+            <input type="text" id="video-url" name="youtube_url" placeholder="Enter YouTube video URL here">
+            <button class="summarize" onclick="summarizeVideo('youtube')">Summarize</button>
+        </div>
+        <div id="status"></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocQ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleindex.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/9b7a42a725.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="sub-title">
+        <h1>Doc<i class="fa-solid fa-magnifying-glass-chart"></i></h1>
+        <p>Let's interact with your files...!!</p>
+    </div>
+    <div class="main-part">
+        <div class="container" onclick="navigate('/image')">
+            <i class="fas fa-image"></i>
+            <p class="format-title">IMAGE</p>
+        </div>
+        <div class="container" onclick="navigate('/pdf')">
+            <i class="fas fa-file-pdf"></i>
+            <p class="format-title">PDF</p>
+        </div>
+        <div class="container" onclick="navigate('/video')">
+            <i class="fas fa-video"></i>
+            <p class="format-title">VIDEO</p>
+        </div>
+    </div>
+
+    <script>
+        function navigate(path) {
+            window.location.href = path;
+        }
+    </script>
+</body>
+</html>
