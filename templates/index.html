@@ -8,27 +8,96 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9b7a42a725.js" crossorigin="anonymous"></script>
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes borderGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(52, 152, 219, 0.8);
+            }
+        }
+
+        .animate__fadeInUp {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .container {
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover::before {
+            border-color: #3498db;
+            animation: borderGlow 1.5s infinite;
+        }
+
+        .container i {
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover i {
+            transform: scale(1.1);
+        }
+    </style>
 </head>
 <body>
-    <div class="sub-title">
+    <div class="sub-title animate__fadeInUp">
         <h1>Doc<i class="fa-solid fa-magnifying-glass-chart"></i></h1>
         <p>Let's interact with your files...!!</p>
     </div>
     <div class="main-part">
-        <div class="container" onclick="navigate('/image')">
+        <div class="container animate__fadeInUp" style="animation-delay: 0.2s;" onclick="navigate('/image')">
             <i class="fas fa-image"></i>
             <p class="format-title">IMAGE</p>
         </div>
-        <div class="container" onclick="navigate('/pdf')">
+        <div class="container animate__fadeInUp" style="animation-delay: 0.4s;" onclick="navigate('/pdf')">
             <i class="fas fa-file-pdf"></i>
             <p class="format-title">PDF</p>
         </div>
-        <div class="container" onclick="navigate('/video')">
+        <div class="container animate__fadeInUp" style="animation-delay: 0.6s;" onclick="navigate('/video')">
             <i class="fas fa-video"></i>
             <p class="format-title">VIDEO</p>
         </div>
     </div>
-
     <script>
         function navigate(path) {
             window.location.href = path;

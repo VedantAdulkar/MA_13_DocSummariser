@@ -47,27 +47,27 @@ function uploadFile(file) {
         status.textContent = 'Please upload a PDF file.';
         return;
     }
-
     let reader = new FileReader();
     reader.readAsArrayBuffer(file);
     reader.onload = function(e) {
         let typedarray = new Uint8Array(e.target.result);
-
-        pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-            status.textContent = 'PDF uploaded successfully!';
-            pdfContent.innerHTML = ''; // Clear previous content
-
-            // Render all pages
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                renderPage(pdf, pageNum);
-            }
-
-            summarizeButton.disabled = false;
-        }).catch(function(error) {
-            console.error('Error loading PDF:', error);
-            status.textContent = 'Error loading PDF. Please try again.';
-        });
+        loadPdf(typedarray);
     };
+}
+
+function loadPdf(data) {
+    pdfjsLib.getDocument(data).promise.then(function(pdf) {
+        status.textContent = 'PDF uploaded successfully!';
+        pdfContent.innerHTML = ''; // Clear previous content
+        // Render all pages
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            renderPage(pdf, pageNum);
+        }
+        summarizeButton.disabled = false;
+    }).catch(function(error) {
+        console.error('Error loading PDF:', error);
+        status.textContent = 'Error loading PDF. Please try again.';
+    });
 }
 
 function renderPage(pdf, pageNumber) {
@@ -107,5 +107,5 @@ summarizeButton.addEventListener('click', summarizePDF);
 function summarizePDF() {
     // Here you would implement the logic to summarize the PDF
     // For now, we'll just update the status
-    status.textContent = 'Summarizing PDF... (This feature is not yet implemented)';
+    status.textContent = 'Extracting PDF... (This feature is not yet implemented)';
 }

@@ -91,12 +91,12 @@ h3 {
 #preview {
     flex: 1;
     border: 2px solid #FFD700;
-    border-radius: 15px;
+    border-radius: 20px;
     padding: 15px;
 }
 
 #pdf-content {
-    height: 500px; /* or whatever height you prefer */
+    height: 500px;
     overflow-y: auto;
     border: 1px solid #FFD700;
     padding: 10px;
@@ -135,9 +135,53 @@ h3 {
     cursor: not-allowed;
 }
 
+.question-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+#question {
+    flex-grow: 1;
+    max-width: 200px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: 2px solid #FFD700;
+    border-radius: 25px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+}
+
+#question::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+#ask {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #0F0F20;
+    background-color: #FFD700;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#ask:hover {
+    background-color: #FFA500;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
 #status {
     margin-top: 20px;
     text-align: center;
     font-weight: bold;
     color: #FFD700;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
 }

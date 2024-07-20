@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Summarizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleimage.css') }}">
+    <script src="https://kit.fontawesome.com/9b7a42a725.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileElem');
+            const submitButton = document.getElementById('submit-button');
+            const questionInput = document.getElementById('question-input');
+            const answerDiv = document.getElementById('answer');
+            const imageContent = document.getElementById('image-content');
+            const statusDiv = document.getElementById('status');
+
+            fileInput.addEventListener('change', function(event) {
+                const files = event.target.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = e.target.result;
+                        imgElement.id = 'uploaded-image';
+                        imgElement.alt = 'Uploaded Image';
+                        
+                        imageContent.innerHTML = ''; // Clear previous content
+                        imageContent.appendChild(imgElement);
+
+                        submitButton.disabled = false; // Enable the button
+                        statusDiv.textContent = ''; // Clear status text
+                    };
+
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            submitButton.addEventListener('click', function() {
+                const files = fileInput.files;
+                if (files.length > 0) {
+                    const formData = new FormData();
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append('image_files', files[i]);
+                    }
+
+                    fetch('/process_image', {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => response.json()).then(data => {
+                        if (data.message) {
+                            statusDiv.textContent = data.message;
+                        } else if (data.error) {
+                            statusDiv.textContent = data.error;
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        statusDiv.textContent = 'An error occurred while processing the image.';
+                    });
+                }
+            });
+
+            document.getElementById('ask-question-button').addEventListener('click', function() {
+                const question = questionInput.value;
+                if (question) {
+                    fetch('/ask_question', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ question: question })
+                    }).then(response => response.json()).then(data => {
+                        if (data.answer) {
+                            answerDiv.textContent = 'Answer: ' + data.answer;
+                        } else if (data.error) {
+                            answerDiv.textContent = 'Error: ' + data.error;
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        answerDiv.textContent = 'An error occurred while getting the answer.';
+                    });
+                } else {
+                    answerDiv.textContent = 'Please enter a question.';
+                }
+            });
+
+            // Optional: Add drag-and-drop functionality
+            const dropArea = document.getElementById('drop-area');
+            dropArea.addEventListener('dragover', function(event) {
+                event.preventDefault();
+                dropArea.classList.add('highlight');
+            });
+
+            dropArea.addEventListener('dragleave', function() {
+                dropArea.classList.remove('highlight');
+            });
+
+            dropArea.addEventListener('drop', function(event) {
+                event.preventDefault();
+                dropArea.classList.remove('highlight');
+                const files = event.dataTransfer.files;
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Doc<i class="fa-solid fa-magnifying-glass-chart"></i></h1>
+            <h2>Image Summarizer</h2>
+        </header>
+        <div class="content">
+            <div id="drop-area">
+                <p>Drag & Drop your Image here</p>
+                <input type="file" id="fileElem" accept="image/*" multiple>
+                <label class="button" for="fileElem">Choose File</label>
+            </div>
+            <div id="preview">
+                <h3>Preview</h3>
+                <div id="image-content"></div>
+            </div>
+            <div id="question-section">
+                <h3>Ask a Question</h3>
+                <input type="text" id="question-input" placeholder="Enter your question here">
+                <button id="ask-question-button">Submit Question</button>
+                <div id="answer"></div>
+            </div>
+        </div>
+        <button id="submit-button" disabled>Submit & Process</button>
+        <div id="status"></div>
+    </div>
+</body>
+</html>

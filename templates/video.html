@@ -3,16 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Summarizer!</title>
+    <title>Video Summarizer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='stylevideo.css') }}">
-    <script src="{{ url_for('static', filename='scriptvideo.js') }}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://kit.fontawesome.com/9b7a42a725.js" crossorigin="anonymous"></script>
+    
+    <style>
+        /* Loader CSS */
+        .loader {
+            display: none;
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hide loader by default */
+        .loader.hidden {
+            display: none;
+        }
+
+        /* Thumbnail CSS */
+        .thumbnail {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .thumbnail img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>DocQ</h1>
+    <header class="animate__animated animate__fadeIn">
+        <h1>Doc<i class="fa-solid fa-magnifying-glass-chart"></i></h1>
         <h2>Video Summarizer</h2>
     </header>
-    <div class="container">
+    <div class="container animate__animated animate__fadeInUp">
         <div class="tab-container">
             <button class="tab-button active" data-tab="import">Import Video</button>
             <button class="tab-button" data-tab="youtube">YouTube Video</button>
@@ -23,10 +61,113 @@
             <button class="summarize" onclick="summarizeVideo('import')">Summarize</button>
         </div>
         <div id="youtube" class="section">
-            <input type="text" id="video-url" name="youtube_url" placeholder="Enter YouTube video URL here">
+            <input type="text" id="video-url" name="youtube_url" placeholder="Enter YouTube video URL here" oninput="updateThumbnail()">
             <button class="summarize" onclick="summarizeVideo('youtube')">Summarize</button>
+            <div class="thumbnail" id="thumbnail">
+                <img id="thumbnail-img" src="" alt="YouTube Thumbnail">
+            </div>
         </div>
-        <div id="status"></div>
+        <div id="status" data-transcript=""></div>
+        <div class="loader" id="loader"></div> <!-- Loader element -->
     </div>
+    <div class="question-section animate__animated animate__fadeInUp">
+        <input type="text" id="question-input" placeholder="Ask a question about the video">
+        <button id="ask-button" class="ask-button">Ask Question</button>
+    </div>
+    <div id="answer-display" class="answer-display animate__animated animate__fadeIn"></div>
+
+    <script>
+        function updateThumbnail() {
+            const videoUrl = document.getElementById('video-url').value;
+            const thumbnailDiv = document.getElementById('thumbnail');
+            const thumbnailImg = document.getElementById('thumbnail-img');
+            
+            if (videoUrl) {
+                const videoId = videoUrl.split("v=")[1].split("&")[0];
+                thumbnailImg.src = `https://img.youtube.com/vi/${videoId}/0.jpg`;
+                thumbnailDiv.style.display = 'block';
+            } else {
+                thumbnailDiv.style.display = 'none';
+            }
+        }
+
+        function summarizeVideo(type) {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block'; // Show the loader
+
+            let formData = new FormData();
+            formData.append('type', type);
+            if (type === 'youtube') {
+                const videoUrl = document.getElementById('video-url').value;
+                formData.append('youtube_url', videoUrl);
+            } else if (type === 'import') {
+                const fileInput = document.getElementById('file-upload');
+                formData.append('file', fileInput.files[0]);
+            }
+
+            fetch('/summarize', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusDiv = document.getElementById('status');
+                if (data.error) {
+                    statusDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+                } else {
+                    statusDiv.innerHTML = `<p>Summary: ${data.summary}</p>`;
+                    statusDiv.setAttribute('data-transcript', data.transcript || ''); // Save transcript in a data attribute
+                }
+            })
+            .catch(error => {
+                const statusDiv = document.getElementById('status');
+                statusDiv.innerHTML = `<p>Error: ${error}</p>`;
+            })
+            .finally(() => {
+                loader.style.display = 'none'; // Hide the loader after processing
+            });
+        }
+
+        document.getElementById('ask-button').addEventListener('click', function() {
+            const question = document.getElementById('question-input').value;
+            const transcript = document.querySelector('#status').getAttribute('data-transcript'); // Get transcript from data attribute
+            console.log(transcript);
+            console.log(question);
+
+            if (!question || !transcript) {
+                alert('Please ensure you have a question and transcript available.');
+                return;
+            }
+
+            fetch('/ask_question', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ transcript: transcript, question: question }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.answer) {
+                    console.log(data.answer);
+                    document.getElementById('answer-display').innerText = `Answer: ${data.answer}`;
+                } else {
+                    document.getElementById('answer-display').innerText = 'No answer found.';
+                }
+            })
+            .catch(error => {
+                document.getElementById('answer-display').innerText = `Error: ${error}`;
+            });
+        });
+
+        // Script to handle tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+                document.getElementById(button.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>

@@ -93,11 +93,13 @@ h3 {
     border: 2px solid #FFD700;
     border-radius: 15px;
     padding: 15px;
+    width: 350px;
 }
 
 #image-content {
     height: 300px;
-    overflow-y: auto;
+    width: 90%;
+    overflow: hidden;
     border: 1px solid #FFD700;
     padding: 10px;
     border-radius: 10px;
@@ -113,7 +115,7 @@ h3 {
     object-fit: contain;
 }
 
-#summarize {
+#submit-button {
     display: block;
     margin: 20px auto;
     font-size: 1.2rem;
@@ -127,15 +129,63 @@ h3 {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-#summarize:hover:not(:disabled) {
+#submit-button:hover:not(:disabled) {
     background-color: #FFA500;
     transform: translateY(-3px);
     box-shadow: 0 6px 8px rgba(0,0,0,0.2);
 }
 
-#summarize:disabled {
+#submit-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+#question-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+}
+
+.question-input-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#question-input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: 2px solid #FFD700;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+#ask-question-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #0F0F20;
+    background-color: #FFD700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#ask-question-button:hover {
+    background-color: #FFA500;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+#answer {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    font-size: 1rem;
 }
 
 #status {
@@ -143,16 +193,7 @@ h3 {
     text-align: center;
     font-weight: bold;
     color: #FFD700;
-}
-#image-content {
-    height: 300px;
-    width: 100%;
-    overflow: hidden;
-    border: 1px solid #FFD700;
     padding: 10px;
-    border-radius: 10px;
     background-color: rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    border-radius: 10px;
 }

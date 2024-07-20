@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Summarizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylepdf.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <script src="https://kit.fontawesome.com/9b7a42a725.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileElem');
+            const summarizeButton = document.getElementById('summarize');
+            const askButton = document.getElementById('askButton');
+            const questionInput = document.getElementById('questionInput');
+            const pdfContent = document.getElementById('pdf-content');
+            const statusDiv = document.getElementById('status');
+            const answerDiv = document.getElementById('answer');
+
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const fileReader = new FileReader();
+
+                    fileReader.onload = function(event) {
+                        const loadingTask = pdfjsLib.getDocument({ data: event.target.result });
+
+                        loadingTask.promise.then(pdf => {
+                            pdfContent.innerHTML = ''; // Clear previous content
+
+                            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                                pdf.getPage(pageNum).then(page => {
+                                    const scale = 1.5; // Adjust scaling as needed
+                                    const viewport = page.getViewport({ scale });
+
+                                    // Create a canvas for each page
+                                    const canvas = document.createElement('canvas');
+                                    const context = canvas.getContext('2d');
+                                    canvas.height = viewport.height;
+                                    canvas.width = viewport.width;
+
+                                    pdfContent.appendChild(canvas);
+
+                                    const renderContext = {
+                                        canvasContext: context,
+                                        viewport: viewport
+                                    };
+                                    page.render(renderContext);
+                                });
+                            }
+
+                            summarizeButton.disabled = false; // Enable the button
+                            statusDiv.textContent = ''; // Clear status text
+                        }, reason => {
+                            console.error(reason);
+                        });
+                    };
+
+                    fileReader.readAsArrayBuffer(file);
+                }
+            });
+
+            summarizeButton.addEventListener('click', function() {
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch('/extract', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        statusDiv.textContent = 'Error: ' + data.error;
+                    } else {
+                        statusDiv.textContent = 'File processed successfully';
+                        askButton.disabled = false;
+                        questionInput.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    statusDiv.textContent = 'Error: ' + error.message;
+                });
+            });
+
+            askButton.addEventListener('click', function() {
+                const question = questionInput.value;
+
+                fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        answerDiv.textContent = 'Error: ' + data.error;
+                    } else {
+                        answerDiv.textContent = 'Answer: ' + data.answer;
+                    }
+                })
+                .catch(error => {
+                    answerDiv.textContent = 'Error: ' + error.message;
+                });
+            });
+
+            // Optional: Add drag-and-drop functionality
+            const dropArea = document.getElementById('drop-area');
+            dropArea.addEventListener('dragover', function(event) {
+                event.preventDefault();
+                dropArea.classList.add('highlight');
+            });
+
+            dropArea.addEventListener('dragleave', function() {
+                dropArea.classList.remove('highlight');
+            });
+
+            dropArea.addEventListener('drop', function(event) {
+                event.preventDefault();
+                dropArea.classList.remove('highlight');
+                const files = event.dataTransfer.files;
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            });
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        header h1 {
+            color: #ff7f50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        header h2 {
+            color: #aaa;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            text-align: center;
+        }
+
+        #drop-area {
+            border: 2px dashed #ff7f50;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            background-color: #333;
+        }
+
+        #drop-area.highlight {
+            border-color: #28a745;
+        }
+
+        #drop-area p {
+            margin: 0;
+            font-size: 16px;
+            color: #ddd;
+        }
+
+        #fileElem {
+            display: none;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #ff7f50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .button:hover {
+            background-color: #e55e3c;
+        }
+
+        #preview {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        #pdf-content {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        #summarize {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        #summarize:disabled {
+            background-color: #6c757d;
+        }
+
+        #status {
+            margin-top: 20px;
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .question-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .question-container input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 2px solid #ff7f50;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-right: 10px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .question-container button {
+            padding: 10px 20px;
+            background-color: #ff7f50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .question-container button:hover {
+            background-color: #e55e3c;
+        }
+
+        #answer {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Doc<i class="fa-solid fa-magnifying-glass-chart"></i></h1>
+            <h2>PDF Summarizer</h2>
+        </header>
+        <div class="content">
+            <div id="drop-area">
+                <p>Drag & Drop your PDF here</p>
+                <input type="file" id="fileElem" accept="application/pdf">
+                <label class="button" for="fileElem">Choose File</label>
+            </div>
+            <div id="preview">
+                <h3>Preview</h3>
+                <div id="pdf-content"></div>
+            </div>
+        </div>
+        <button id="summarize" disabled>Extract</button>
+        <div id="status"></div>
+        <div class="question-container">
+            <input type="text" id="questionInput" placeholder="Ask a question" disabled>
+            <button id="askButton" disabled>Ask</button>
+        </div>
+        <div id="answer"></div>
+    </div>
+</body>
+</html>
