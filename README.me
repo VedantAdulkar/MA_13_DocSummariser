@@ -1,1 +1,93 @@
-HELLO
+# DocQ-DocSummariser
+
+## Overview
+
+Introducing DocQ-DocSummariser – an advanced AI-powered application designed to extract, summarize, and interact with text from images, PDFs, and YouTube videos. Leveraging cutting-edge OCR, NLP, and conversational AI technologies, this tool offers comprehensive text processing and interactive capabilities, making it an invaluable resource for students, researchers, and professionals.
+
+## Key Features
+
+- **Image to Text:** Convert images to readable text using advanced OCR.
+- **PDF to Text:** Extract text from PDF documents seamlessly.
+- **YouTube Video Summarization:** Summarize YouTube video content efficiently.
+- **Local Video Summarization:** Summarize the content of local video files.
+- **Interactive Q&A:** Chat with the summarized content to ask specific questions and get detailed answers.
+
+## Technologies Used
+
+- **Flask:** For building the web application.
+- **Pytesseract:** For Optical Character Recognition (OCR).
+- **LangChain:** For text processing and question-answering chains.
+- **Google Generative AI:** For embeddings and conversational models.
+- **FAISS:** For vector storage and similarity search.
+- **YouTube Transcript API:** For fetching YouTube video transcripts.
+- **MoviePy & SpeechRecognition:** For extracting and transcribing audio from videos.
+- **Transformers:** For text summarization.
+
+## Installation
+
+To set up the DocQ-DocSummariser project locally, follow these steps:
+
+1. **Clone the Repository:**
+
+   ```bash
+   git clone https://github.com/VedantAdulkar/MA_13_DocSummariser.git
+   ```
+
+2. **Navigate to the Project Directory:**
+
+   ```bash
+   cd MA_13_DocSummariser
+   ```
+
+3. **Create a Virtual Environment:**
+
+   ```bash
+   python -m venv venv
+   ```
+
+4. **Activate the Virtual Environment:**
+
+   - On Windows:
+
+     ```bash
+     venv\Scripts\activate
+     ```
+
+   - On macOS/Linux:
+
+     ```bash
+     source venv/bin/activate
+     ```
+
+5. **Install Dependencies:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+6. **Run the Application:**
+
+   ```bash
+   python app.py
+   ```
+
+   The web application will be accessible at `http://127.0.0.1:5000/`.
+
+## Usage
+
+1. **Upload an Image or PDF:** Use the web interface to upload an image or PDF for text extraction.
+2. **Provide YouTube or Local Video URL:** Enter the URL of a YouTube video or upload a local video file for summarization.
+3. **Interact with the Summarized Text:** Use the interactive Q&A feature to ask specific questions about the summarized content.
+
+## Contributing
+
+We welcome contributions to improve DocQ-DocSummariser! Please follow these guidelines:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Commit your changes and push to your fork.
+4. Open a pull request with a description of your changes.
+
+## Contact
+
+For any inquiries or issues, please contact [vedantadulkar22@gmail.com](mailto:vedantadulkar22@gmail.com).
